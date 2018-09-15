@@ -10,16 +10,16 @@ module.exports = class NotifyPlugin {
 
   apply(compiler) {
     // Hack to get rid of the 'Child extract-text...' log spam
-    compiler.plugin('done', (stat) => {
+    compiler.hooks.done.tap('NotifyPlugin', (stat) => {
       stat.compilation.children = this.hideChildren ? [] : stat.compilation.children;
     });
 
-    compiler.plugin('compile', () => {
+    compiler.hooks.compile.tap('NotifyPlugin', () => {
       const action = this.firstRun ? 'starting to build' : 'updating';
       console.log('==> ' + chalk.cyan(`Webpack is ${action} ${this.name}...`));
     });
 
-    compiler.plugin('done', this.onDone.bind(this));
+    compiler.hooks.done.tap('NotifyPlugin', this.onDone.bind(this));
   }
 
   onDone(rawWebpackStats) {
